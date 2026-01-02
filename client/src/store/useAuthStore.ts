@@ -11,23 +11,32 @@ interface AuthStore extends AuthState {
   fetchUserProfile: (userId: string) => Promise<User | null>;
 }
 
-/**
- * Fetches the full user profile from the users table
- */
-const fetchUserProfile = async (userId: string): Promise<User | null> => {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', userId)
-    .single();
 
-  if (error) {
-    console.error('[Auth] Error fetching user profile:', error);
+const fetchUserProfile = async (userId: string): Promise<User | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.error('[Auth] Error fetching user profile:', error);
+      return null;
+    }
+
+    if (!data) {
+      console.error('[Auth] No user profile found for ID:', userId);
+      return null;
+    }
+
+    return data as User;
+  } catch (error) {
+    console.error('[Auth] Exception fetching user profile:', error);
     return null;
   }
-
-  return data as User;
 };
+
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
@@ -53,6 +62,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         },
       });
 
+      console.log('[Auth] Auth Data:', authData);
+
       if (authError) {
         throw authError;
       }
@@ -61,34 +72,29 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         throw new Error('Failed to create user');
       }
 
-      // Insert user profile into users table
-      const { error: profileError } = await supabase
-        .from('users')
-        .insert({
-          id: authData.user.id,
-          email: authData.user.email!,
-          full_name: fullName,
-        });
+      // If session exists, user is automatically signed in (email confirmation disabled)
+      if (authData.session) {
+        const profile = await fetchUserProfile(authData.user.id);
+        console.log('[Auth] Profile fetched:', profile);
 
-      if (profileError) {
-        throw profileError;
-      }
+        if (!profile) {
+          throw new Error('Profile creation failed. Please contact support.');
+        }
 
-      // Fetch the complete user profile
-      const userProfile = await fetchUserProfile(authData.user.id);
-
-      if (userProfile) {
         set({
-          user: userProfile,
+          user: profile,
           session: authData.session,
           loading: false,
           error: null,
         });
       } else {
+        // Email confirmation required - user needs to check their email
         set({
           loading: false,
-          error: 'Failed to fetch user profile after signup',
+          error: null,
         });
+        // You might want to show a success message here instead
+        alert('Account created! Please check your email to confirm.');
       }
     } catch (error: any) {
       set({
@@ -102,7 +108,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -111,24 +117,24 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         throw error;
       }
 
-      if (!data.user || !data.session) {
+      if (!authData.user || !authData.session) {
         throw new Error('Failed to sign in');
       }
 
-      // Fetch the complete user profile from users table
-      const userProfile = await fetchUserProfile(data.user.id);
+      // Fetch the complete user profile from public.users table
+      const userProfile = await fetchUserProfile(authData.user.id);
 
       if (userProfile) {
         set({
           user: userProfile,
-          session: data.session,
+          session: authData.session,
           loading: false,
           error: null,
         });
       } else {
         set({
           loading: false,
-          error: 'Failed to fetch user profile after sign in',
+          error: 'Failed to fetch user profile. Please try again.',
         });
       }
     } catch (error: any) {
@@ -175,7 +181,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }
 
       if (session?.user) {
-        // Fetch user profile
+        // Fetch user profile from public.users table
         const userProfile = await fetchUserProfile(session.user.id);
 
         if (userProfile) {
@@ -202,17 +208,38 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       // Set up auth state change listener
       supabase.auth.onAuthStateChange(async (event, session) => {
-        if (session?.user) {
+        console.log('[Auth] Auth state changed:', event);
+
+        if (event === 'SIGNED_IN' && session?.user) {
+          // User signed in - fetch profile from public.users
           const userProfile = await fetchUserProfile(session.user.id);
           set({
             user: userProfile,
             session,
             error: null,
           });
-        } else {
+        } else if (event === 'SIGNED_OUT') {
+          // User signed out - clear state
           set({
             user: null,
             session: null,
+            error: null,
+          });
+        } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+          // Token refreshed - update session but keep existing user data
+          const currentUser = get().user;
+          set({
+            session,
+            // Only update user if we don't have one (shouldn't happen, but safety check)
+            user: currentUser || (await fetchUserProfile(session.user.id)),
+            error: null,
+          });
+        } else if (event === 'USER_UPDATED' && session?.user) {
+          // User updated - refresh profile
+          const userProfile = await fetchUserProfile(session.user.id);
+          set({
+            user: userProfile,
+            session,
             error: null,
           });
         }
