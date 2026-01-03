@@ -1,45 +1,45 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, Loader2, Eye, EyeOff, X } from 'lucide-react';
-import { useAuthStore } from '../store/useAuthStore';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Mail, Lock, User, Loader2, Eye, EyeOff, X } from "lucide-react";
+import { useAuthStore } from "../store/useAuthStore";
 
-type AuthMode = 'login' | 'signup';
+type AuthMode = "login" | "signup";
 
 const AuthPage = () => {
   const navigate = useNavigate();
   const { signIn, signUp, loading, error, clearError, user } = useAuthStore();
 
-  const [mode, setMode] = useState<AuthMode>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [mode, setMode] = useState<AuthMode>("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   }, [user, navigate]);
 
   // Load remember me preference
   useEffect(() => {
-    const remembered = localStorage.getItem('rememberMe') === 'true';
+    const remembered = localStorage.getItem("rememberMe") === "true";
     setRememberMe(remembered);
   }, []);
 
   // Save remember me preference
   useEffect(() => {
-    localStorage.setItem('rememberMe', rememberMe.toString());
+    localStorage.setItem("rememberMe", rememberMe.toString());
   }, [rememberMe]);
 
   const handleModeSwitch = (newMode: AuthMode) => {
     setMode(newMode);
     clearError();
-    setEmail('');
-    setPassword('');
-    setFullName('');
+    setEmail("");
+    setPassword("");
+    setFullName("");
     setShowPassword(false);
   };
 
@@ -49,22 +49,29 @@ const AuthPage = () => {
     }
   };
 
-  const getPasswordStrength = (pwd: string): { strength: number; color: string; label: string } => {
-    if (pwd.length === 0) return { strength: 0, color: 'bg-gray-200', label: '' };
-    if (pwd.length < 6) return { strength: 1, color: 'bg-red-500', label: 'Weak' };
-    if (pwd.length < 8) return { strength: 2, color: 'bg-yellow-500', label: 'Fair' };
-    if (pwd.length < 12) return { strength: 3, color: 'bg-blue-500', label: 'Good' };
-    return { strength: 4, color: 'bg-green-500', label: 'Strong' };
+  const getPasswordStrength = (
+    pwd: string
+  ): { strength: number; color: string; label: string } => {
+    if (pwd.length === 0)
+      return { strength: 0, color: "bg-gray-200", label: "" };
+    if (pwd.length < 6)
+      return { strength: 1, color: "bg-red-500", label: "Weak" };
+    if (pwd.length < 8)
+      return { strength: 2, color: "bg-yellow-500", label: "Fair" };
+    if (pwd.length < 12)
+      return { strength: 3, color: "bg-blue-500", label: "Good" };
+    return { strength: 4, color: "bg-green-500", label: "Strong" };
   };
 
-  const passwordStrength = mode === 'signup' ? getPasswordStrength(password) : null;
+  const passwordStrength =
+    mode === "signup" ? getPasswordStrength(password) : null;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     clearError();
 
     try {
-      if (mode === 'login') {
+      if (mode === "login") {
         await signIn(email, password);
       } else {
         if (password.length < 6) {
@@ -72,10 +79,10 @@ const AuthPage = () => {
         }
         await signUp(email, password, fullName);
       }
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
       // Error is handled by the store
-      console.error('Auth error:', err);
+      console.error("Auth error:", err);
     }
   };
 
@@ -96,11 +103,11 @@ const AuthPage = () => {
           <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
             <button
               type="button"
-              onClick={() => handleModeSwitch('login')}
+              onClick={() => handleModeSwitch("login")}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-                mode === 'login'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                mode === "login"
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
               }`}
               aria-label="Switch to login mode"
             >
@@ -108,11 +115,11 @@ const AuthPage = () => {
             </button>
             <button
               type="button"
-              onClick={() => handleModeSwitch('signup')}
+              onClick={() => handleModeSwitch("signup")}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-                mode === 'signup'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                mode === "signup"
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
               }`}
               aria-label="Switch to signup mode"
             >
@@ -140,9 +147,12 @@ const AuthPage = () => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Full Name (Signup only) */}
-            {mode === 'signup' && (
+            {mode === "signup" && (
               <div className="space-y-1">
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Full Name
                 </label>
                 <div className="relative">
@@ -168,7 +178,10 @@ const AuthPage = () => {
 
             {/* Email */}
             <div className="space-y-1">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email
               </label>
               <div className="relative">
@@ -193,7 +206,10 @@ const AuthPage = () => {
 
             {/* Password */}
             <div className="space-y-1">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <div className="relative">
@@ -202,39 +218,50 @@ const AuthPage = () => {
                 </div>
                 <input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   required
-                  minLength={mode === 'signup' ? 6 : undefined}
+                  minLength={mode === "signup" ? 6 : undefined}
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     handleInputChange();
                   }}
                   className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  placeholder={mode === 'signup' ? 'At least 6 characters' : 'Enter your password'}
+                  placeholder={
+                    mode === "signup"
+                      ? "At least 6 characters"
+                      : "Enter your password"
+                  }
                   aria-label="Password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
               {/* Password Strength Indicator (Signup only) */}
-              {mode === 'signup' && password && passwordStrength && (
+              {mode === "signup" && password && passwordStrength && (
                 <div className="mt-2 space-y-1">
                   <div className="flex items-center space-x-2">
                     <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div
                         className={`h-full transition-all duration-300 ${passwordStrength.color}`}
-                        style={{ width: `${(passwordStrength.strength / 4) * 100}%` }}
+                        style={{
+                          width: `${(passwordStrength.strength / 4) * 100}%`,
+                        }}
                       />
                     </div>
                     {passwordStrength.label && (
-                      <span className={`text-xs font-medium ${passwordStrength.color.replace('bg-', 'text-')}`}>
+                      <span
+                        className={`text-xs font-medium ${passwordStrength.color.replace(
+                          "bg-",
+                          "text-"
+                        )}`}
+                      >
                         {passwordStrength.label}
                       </span>
                     )}
@@ -244,7 +271,7 @@ const AuthPage = () => {
             </div>
 
             {/* Remember Me (Login only) */}
-            {mode === 'login' && (
+            {mode === "login" && (
               <div className="flex items-center">
                 <input
                   id="rememberMe"
@@ -253,7 +280,10 @@ const AuthPage = () => {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
+                <label
+                  htmlFor="rememberMe"
+                  className="ml-2 block text-sm text-gray-700"
+                >
                   Remember me
                 </label>
               </div>
@@ -268,17 +298,19 @@ const AuthPage = () => {
               {loading ? (
                 <>
                   <Loader2 className="animate-spin h-5 w-5 mr-2" />
-                  {mode === 'login' ? 'Signing in...' : 'Creating account...'}
+                  {mode === "login" ? "Signing in..." : "Creating account..."}
                 </>
+              ) : mode === "login" ? (
+                "Sign In"
               ) : (
-                mode === 'login' ? 'Sign In' : 'Create Account'
+                "Create Account"
               )}
             </button>
           </form>
 
           {/* Footer Links */}
           <div className="text-center space-y-2">
-            {mode === 'login' ? (
+            {mode === "login" ? (
               <>
                 <a
                   href="#"
@@ -291,11 +323,11 @@ const AuthPage = () => {
                   Forgot password?
                 </a>
                 <p className="text-sm text-gray-600">
-                  Don't have an account?{' '}
+                  Don't have an account?{" "}
                   <button
                     type="button"
-                    onClick={() => handleModeSwitch('signup')}
-                    className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                    onClick={() => handleModeSwitch("signup")}
+                    className="text-blue-600 hover:text-blue-700 font-medium transition-colors cursor-pointer"
                   >
                     Sign up
                   </button>
@@ -303,11 +335,11 @@ const AuthPage = () => {
               </>
             ) : (
               <p className="text-sm text-gray-600">
-                Already have an account?{' '}
+                Already have an account?{" "}
                 <button
                   type="button"
-                  onClick={() => handleModeSwitch('login')}
-                  className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                  onClick={() => handleModeSwitch("login")}
+                  className="text-blue-600 hover:text-blue-700 font-medium transition-colors cursor-pointer"
                 >
                   Sign in
                 </button>
@@ -321,4 +353,3 @@ const AuthPage = () => {
 };
 
 export default AuthPage;
-

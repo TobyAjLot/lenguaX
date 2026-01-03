@@ -1,8 +1,10 @@
-import { create } from 'zustand';
-import { supabase } from '../lib/supabase';
-import type { User, AuthState } from '@shared/types';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { create } from "zustand";
+import { supabase } from "../lib/supabase";
+import type { User, AuthState } from "@shared/types";
+import type { Session } from "@supabase/supabase-js";
 
-interface AuthStore extends AuthState {
+interface AuthStore extends AuthState<Session> {
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -11,32 +13,30 @@ interface AuthStore extends AuthState {
   fetchUserProfile: (userId: string) => Promise<User | null>;
 }
 
-
 const fetchUserProfile = async (userId: string): Promise<User | null> => {
   try {
     const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
+      .from("users")
+      .select("*")
+      .eq("id", userId)
       .single();
 
     if (error) {
-      console.error('[Auth] Error fetching user profile:', error);
+      console.error("[Auth] Error fetching user profile:", error);
       return null;
     }
 
     if (!data) {
-      console.error('[Auth] No user profile found for ID:', userId);
+      console.error("[Auth] No user profile found for ID:", userId);
       return null;
     }
 
     return data as User;
   } catch (error) {
-    console.error('[Auth] Exception fetching user profile:', error);
+    console.error("[Auth] Exception fetching user profile:", error);
     return null;
   }
 };
-
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
@@ -62,23 +62,23 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         },
       });
 
-      console.log('[Auth] Auth Data:', authData);
+      console.log("[Auth] Auth Data:", authData);
 
       if (authError) {
         throw authError;
       }
 
       if (!authData.user) {
-        throw new Error('Failed to create user');
+        throw new Error("Failed to create user");
       }
 
       // If session exists, user is automatically signed in (email confirmation disabled)
       if (authData.session) {
         const profile = await fetchUserProfile(authData.user.id);
-        console.log('[Auth] Profile fetched:', profile);
+        console.log("[Auth] Profile fetched:", profile);
 
         if (!profile) {
-          throw new Error('Profile creation failed. Please contact support.');
+          throw new Error("Profile creation failed. Please contact support.");
         }
 
         set({
@@ -94,12 +94,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           error: null,
         });
         // You might want to show a success message here instead
-        alert('Account created! Please check your email to confirm.');
+        alert("Account created! Please check your email to confirm.");
       }
     } catch (error: any) {
       set({
         loading: false,
-        error: error.message || 'Failed to sign up',
+        error: error.message || "Failed to sign up",
       });
     }
   },
@@ -118,7 +118,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }
 
       if (!authData.user || !authData.session) {
-        throw new Error('Failed to sign in');
+        throw new Error("Failed to sign in");
       }
 
       // Fetch the complete user profile from public.users table
@@ -134,13 +134,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       } else {
         set({
           loading: false,
-          error: 'Failed to fetch user profile. Please try again.',
+          error: "Failed to fetch user profile. Please try again.",
         });
       }
     } catch (error: any) {
       set({
         loading: false,
-        error: error.message || 'Failed to sign in',
+        error: error.message || "Failed to sign in",
       });
     }
   },
@@ -164,7 +164,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     } catch (error: any) {
       set({
         loading: false,
-        error: error.message || 'Failed to sign out',
+        error: error.message || "Failed to sign out",
       });
     }
   },
@@ -174,7 +174,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     try {
       // Check if user is already logged in
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
       if (sessionError) {
         throw sessionError;
@@ -194,7 +197,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         } else {
           set({
             loading: false,
-            error: 'Failed to fetch user profile',
+            error: "Failed to fetch user profile",
           });
         }
       } else {
@@ -208,9 +211,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       // Set up auth state change listener
       supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log('[Auth] Auth state changed:', event);
+        console.log("[Auth] Auth state changed:", event);
 
-        if (event === 'SIGNED_IN' && session?.user) {
+        if (event === "SIGNED_IN" && session?.user) {
           // User signed in - fetch profile from public.users
           const userProfile = await fetchUserProfile(session.user.id);
           set({
@@ -218,14 +221,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             session,
             error: null,
           });
-        } else if (event === 'SIGNED_OUT') {
+        } else if (event === "SIGNED_OUT") {
           // User signed out - clear state
           set({
             user: null,
             session: null,
             error: null,
           });
-        } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+        } else if (event === "TOKEN_REFRESHED" && session?.user) {
           // Token refreshed - update session but keep existing user data
           const currentUser = get().user;
           set({
@@ -234,7 +237,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             user: currentUser || (await fetchUserProfile(session.user.id)),
             error: null,
           });
-        } else if (event === 'USER_UPDATED' && session?.user) {
+        } else if (event === "USER_UPDATED" && session?.user) {
           // User updated - refresh profile
           const userProfile = await fetchUserProfile(session.user.id);
           set({
@@ -247,7 +250,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     } catch (error: any) {
       set({
         loading: false,
-        error: error.message || 'Failed to initialize auth',
+        error: error.message || "Failed to initialize auth",
       });
     }
   },
@@ -256,4 +259,3 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ error: null });
   },
 }));
-

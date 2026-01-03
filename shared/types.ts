@@ -1,17 +1,21 @@
 /**
  * Proficiency levels for user languages
  */
-export type ProficiencyLevel = 'native' | 'fluent' | 'intermediate' | 'beginner';
+export type ProficiencyLevel =
+  | "native"
+  | "fluent"
+  | "intermediate"
+  | "beginner";
 
 /**
  * Session status values
  */
-export type SessionStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
+export type SessionStatus = "pending" | "confirmed" | "completed" | "cancelled";
 
 /**
  * Message type values
  */
-export type MessageType = 'text' | 'voice';
+export type MessageType = "text" | "voice";
 
 /**
  * User type based on Supabase users table schema
@@ -43,9 +47,9 @@ export interface UserLanguage {
  * Authentication state for Zustand store
  * Manages the current user session and authentication status
  */
-export interface AuthState {
+export interface AuthState<T> {
   user: User | null;
-  session: any | null; // Supabase Session type - import from @supabase/supabase-js when using
+  session: T | null;
   loading: boolean;
   error: string | null;
 }
@@ -77,4 +81,3 @@ export interface Message {
   message_type: MessageType;
   created_at: string; // ISO timestamp
 }
-
