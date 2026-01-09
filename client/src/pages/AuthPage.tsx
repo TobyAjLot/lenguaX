@@ -14,7 +14,9 @@ const AuthPage = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(
+    localStorage.getItem("rememberMe") === "true"
+  );
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -22,12 +24,6 @@ const AuthPage = () => {
       navigate("/dashboard");
     }
   }, [user, navigate]);
-
-  // Load remember me preference
-  useEffect(() => {
-    const remembered = localStorage.getItem("rememberMe") === "true";
-    setRememberMe(remembered);
-  }, []);
 
   // Save remember me preference
   useEffect(() => {
