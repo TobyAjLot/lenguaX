@@ -18,14 +18,12 @@ export default function AuthPage() {
     localStorage.getItem("rememberMe") === "true"
   );
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (user) {
       navigate("/dashboard");
     }
   }, [user, navigate]);
 
-  // Save remember me preference
   useEffect(() => {
     localStorage.setItem("rememberMe", rememberMe.toString());
   }, [rememberMe]);
