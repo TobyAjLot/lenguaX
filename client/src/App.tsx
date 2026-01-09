@@ -5,6 +5,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProfilePage from "./pages/ProfilePage";
 
 const App = () => {
   const { initialize, user, loading } = useAuthStore();
@@ -26,6 +27,7 @@ const App = () => {
   return (
     <Routes>
       <Route path="/auth" element={<AuthPage />} />
+
       <Route
         path="/dashboard"
         element={
@@ -34,16 +36,17 @@ const App = () => {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/profile"
+        element={user ? <ProfilePage /> : <Navigate to="/auth" replace />}
+      />
+
       <Route
         path="/"
-        element={
-          user ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <Navigate to="/auth" replace />
-          )
-        }
+        element={<Navigate to={user ? "/dashboard" : "/auth"} replace />}
       />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

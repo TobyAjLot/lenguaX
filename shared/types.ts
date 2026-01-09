@@ -1,13 +1,4 @@
 /**
- * Proficiency levels for user languages
- */
-export type ProficiencyLevel =
-  | "native"
-  | "fluent"
-  | "intermediate"
-  | "beginner";
-
-/**
  * Session status values
  */
 export type SessionStatus = "pending" | "confirmed" | "completed" | "cancelled";
@@ -38,7 +29,7 @@ export interface UserLanguage {
   id: string; // UUID
   user_id: string; // UUID
   language_code: string; // e.g., "en", "es"
-  proficiency_level: ProficiencyLevel;
+  proficiency_level: number;
   is_learning: boolean;
   created_at: string; // ISO timestamp
 }

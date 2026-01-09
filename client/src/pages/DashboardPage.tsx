@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Home,
   Search,
@@ -9,28 +9,34 @@ import {
   LogOut,
   Menu,
   X,
-} from 'lucide-react';
-import { useAuthStore } from '../store/useAuthStore';
+} from "lucide-react";
+import { useAuthStore } from "../store/useAuthStore";
+import ProfilePage from "./ProfilePage";
 
-type ActiveTab = 'dashboard' | 'find-partners' | 'sessions' | 'messages' | 'profile';
+type ActiveTab =
+  | "dashboard"
+  | "find-partners"
+  | "sessions"
+  | "messages"
+  | "profile";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
+  const [activeTab, setActiveTab] = useState<ActiveTab>("dashboard");
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   // Close mobile menu on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isMobileMenuOpen) {
+      if (e.key === "Escape" && isMobileMenuOpen) {
         setIsMobileMenuOpen(false);
       }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, [isMobileMenuOpen]);
 
   // Close mobile menu when clicking outside
@@ -38,13 +44,14 @@ const DashboardPage = () => {
     if (isMobileMenuOpen) {
       const handleClickOutside = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
-        if (!target.closest('.sidebar') && !target.closest('.menu-button')) {
+        if (!target.closest(".sidebar") && !target.closest(".menu-button")) {
           setIsMobileMenuOpen(false);
         }
       };
 
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isMobileMenuOpen]);
 
@@ -52,9 +59,9 @@ const DashboardPage = () => {
     setIsSigningOut(true);
     try {
       await signOut();
-      navigate('/auth');
+      navigate("/auth");
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error("Sign out error:", error);
       setIsSigningOut(false);
     }
   };
@@ -65,18 +72,18 @@ const DashboardPage = () => {
   };
 
   const getInitials = (name: string | null | undefined): string => {
-    if (!name) return 'U';
-    const parts = name.trim().split(' ');
+    if (!name) return "U";
+    const parts = name.trim().split(" ");
     if (parts.length === 1) return parts[0][0].toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
   const navItems = [
-    { id: 'dashboard' as ActiveTab, label: 'Dashboard', icon: Home },
-    { id: 'find-partners' as ActiveTab, label: 'Find Partners', icon: Search },
-    { id: 'sessions' as ActiveTab, label: 'My Sessions', icon: Calendar },
-    { id: 'messages' as ActiveTab, label: 'Messages', icon: MessageSquare },
-    { id: 'profile' as ActiveTab, label: 'Profile', icon: User },
+    { id: "dashboard" as ActiveTab, label: "Dashboard", icon: Home },
+    { id: "find-partners" as ActiveTab, label: "Find Partners", icon: Search },
+    { id: "sessions" as ActiveTab, label: "My Sessions", icon: Calendar },
+    { id: "messages" as ActiveTab, label: "Messages", icon: MessageSquare },
+    { id: "profile" as ActiveTab, label: "Profile", icon: User },
   ];
 
   return (
@@ -112,7 +119,9 @@ const DashboardPage = () => {
       {/* Sidebar */}
       <aside
         className={`sidebar fixed md:static inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transform transition-transform duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+          isMobileMenuOpen
+            ? "translate-x-0"
+            : "-translate-x-full md:translate-x-0"
         } pt-16 md:pt-6 flex flex-col`}
       >
         {/* Logo */}
@@ -123,7 +132,10 @@ const DashboardPage = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-2" aria-label="Main navigation">
+        <nav
+          className="flex-1 px-4 py-6 space-y-2"
+          aria-label="Main navigation"
+        >
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -133,11 +145,11 @@ const DashboardPage = () => {
                 onClick={() => handleNavClick(item.id)}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-white"
                 }`}
                 aria-label={item.label}
-                aria-current={isActive ? 'page' : undefined}
+                aria-current={isActive ? "page" : undefined}
               >
                 <Icon className="h-5 w-5" />
                 <span className="font-medium">{item.label}</span>
@@ -152,7 +164,7 @@ const DashboardPage = () => {
             {user?.avatar_url ? (
               <img
                 src={user.avatar_url}
-                alt={user.full_name || 'User'}
+                alt={user.full_name || "User"}
                 className="h-10 w-10 rounded-full object-cover"
               />
             ) : (
@@ -162,10 +174,10 @@ const DashboardPage = () => {
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">
-                {user?.full_name || 'User'}
+                {user?.full_name || "User"}
               </p>
               <p className="text-xs text-gray-400 truncate">
-                {user?.email || ''}
+                {user?.email || ""}
               </p>
             </div>
           </div>
@@ -177,7 +189,7 @@ const DashboardPage = () => {
           >
             <LogOut className="h-4 w-4" />
             <span className="text-sm font-medium">
-              {isSigningOut ? 'Signing out...' : 'Sign Out'}
+              {isSigningOut ? "Signing out..." : "Sign Out"}
             </span>
           </button>
         </div>
@@ -187,11 +199,11 @@ const DashboardPage = () => {
       <main className="flex-1 md:ml-0 pt-16 md:pt-0">
         <div className="max-w-7xl mx-auto p-4 md:p-8">
           {/* Dashboard Tab */}
-          {activeTab === 'dashboard' && (
+          {activeTab === "dashboard" && (
             <div className="animate-fade-in">
               <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Welcome back, {user?.full_name || 'User'}!
+                  Welcome back, {user?.full_name || "User"}!
                 </h1>
                 <p className="text-gray-600">
                   Here's an overview of your language exchange activity.
@@ -232,7 +244,7 @@ const DashboardPage = () => {
                 </h2>
                 <div className="space-y-3">
                   <button
-                    onClick={() => handleNavClick('find-partners')}
+                    onClick={() => handleNavClick("find-partners")}
                     className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
                     Find Language Partners
@@ -243,7 +255,7 @@ const DashboardPage = () => {
           )}
 
           {/* Find Partners Tab */}
-          {activeTab === 'find-partners' && (
+          {activeTab === "find-partners" && (
             <div className="animate-fade-in">
               <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200 text-center">
                 <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -252,14 +264,15 @@ const DashboardPage = () => {
                 </h2>
                 <p className="text-gray-600">Coming Soon</p>
                 <p className="text-sm text-gray-500 mt-2">
-                  Search for language exchange partners based on your learning goals.
+                  Search for language exchange partners based on your learning
+                  goals.
                 </p>
               </div>
             </div>
           )}
 
           {/* Sessions Tab */}
-          {activeTab === 'sessions' && (
+          {activeTab === "sessions" && (
             <div className="animate-fade-in">
               <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200 text-center">
                 <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -275,7 +288,7 @@ const DashboardPage = () => {
           )}
 
           {/* Messages Tab */}
-          {activeTab === 'messages' && (
+          {activeTab === "messages" && (
             <div className="animate-fade-in">
               <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200 text-center">
                 <MessageSquare className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -291,20 +304,7 @@ const DashboardPage = () => {
           )}
 
           {/* Profile Tab */}
-          {activeTab === 'profile' && (
-            <div className="animate-fade-in">
-              <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200 text-center">
-                <User className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Profile Settings
-                </h2>
-                <p className="text-gray-600">Coming Soon</p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Manage your profile, languages, and preferences.
-                </p>
-              </div>
-            </div>
-          )}
+          {activeTab === "profile" && <ProfilePage />}
         </div>
       </main>
     </div>
@@ -312,4 +312,3 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
-
