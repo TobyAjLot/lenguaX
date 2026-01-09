@@ -1,11 +1,11 @@
-import { Navigate } from 'react-router-dom';
-import { useAuthStore } from '../store/useAuthStore';
+import { Navigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user } = useAuthStore();
 
   if (!user) {
@@ -13,7 +13,4 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   return <>{children}</>;
-};
-
-export default ProtectedRoute;
-
+}

@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, User, Loader2, Eye, EyeOff, X } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, X } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 
 type AuthMode = "login" | "signup";
 
-const AuthPage = () => {
+export default function AuthPage() {
   const navigate = useNavigate();
   const { signIn, signUp, loading, error, clearError, user } = useAuthStore();
 
@@ -293,7 +293,9 @@ const AuthPage = () => {
             >
               {loading ? (
                 <>
-                  <Loader2 className="animate-spin h-5 w-5 mr-2" />
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                  </div>
                   {mode === "login" ? "Signing in..." : "Creating account..."}
                 </>
               ) : mode === "login" ? (
@@ -346,6 +348,4 @@ const AuthPage = () => {
       </div>
     </div>
   );
-};
-
-export default AuthPage;
+}
