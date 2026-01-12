@@ -72,3 +72,19 @@ export interface Message {
   message_type: MessageType;
   created_at: string; // ISO timestamp
 }
+
+export interface CompatiblePartner {
+  id: string;
+  full_name: string;
+  avatar_url: string | null;
+  bio: string | null;
+  native_languages: string[];
+  learning_languages: string[];
+  match_score: number;
+}
+
+export interface PartnerFilters {
+  nativeLanguage?: string;
+  learningLanguage?: string;
+  minMatchScore?: number;
+}
