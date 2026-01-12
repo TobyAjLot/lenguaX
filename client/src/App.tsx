@@ -5,6 +5,7 @@ import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePage from "./pages/ProfilePage";
+import FindPartnersPage from "./pages/FindPartnersPage";
 
 const App = () => {
   const { initialize, user, loading } = useAuthStore();
@@ -51,15 +52,16 @@ const App = () => {
         }
       />
 
-      {/* Placeholder routes for other sections */}
       <Route
         path="/find-partners"
         element={
           <ProtectedRoute>
-            <DashboardPage />
+            <FindPartnersPage />
           </ProtectedRoute>
         }
       />
+
+      {/* Placeholder routes for other sections */}
       <Route
         path="/sessions"
         element={
