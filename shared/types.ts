@@ -50,13 +50,25 @@ export interface AuthState<T> {
  * Represents a scheduled or completed language exchange session between two users
  */
 export interface Session {
-  id: string; // UUID
-  requester_id: string; // UUID
-  partner_id: string; // UUID
-  scheduled_at: string; // ISO timestamp
-  duration_minutes: number;
-  status: SessionStatus;
-  created_at: string; // ISO timestamp
+  id: string;
+  requester_id: string;
+  partner_id: string;
+  scheduled_at: string | null;
+  status: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
+  meeting_link: string | null;
+  created_at: string;
+
+  // Joined data (optional - populated when using select with joins)
+  requester?: {
+    id: string;
+    full_name: string;
+    avatar_url: string | null;
+  };
+  partner?: {
+    id: string;
+    full_name: string;
+    avatar_url: string | null;
+  };
 }
 
 /**

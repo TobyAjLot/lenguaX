@@ -2,11 +2,18 @@ import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import type { CompatiblePartner, PartnerFilters } from "../../../shared/types";
 import { findCompatiblePartners } from "../services/partner.service";
+import {
+  createSessionRequest,
+  checkExistingRequest,
+} from "../services/session.service";
+import ToastContainer from "../components/ToastContainer";
+import { useToast } from "../hooks/useToast";
 import { LANGUAGES } from "../utils/languages";
 import PartnerCard from "./PartnerCard";
 
 export default function FindPartnersTab() {
   const { user } = useAuthStore();
+  const toast = useToast();
   const [partners, setPartners] = useState<CompatiblePartner[]>([]);
   const [filteredPartners, setFilteredPartners] = useState<CompatiblePartner[]>(
     []
@@ -78,9 +85,31 @@ export default function FindPartnersTab() {
   };
 
   const handleConnect = async (partnerId: string) => {
-    // TODO: Implement session request logic
-    console.log("Connecting with partner:", partnerId);
-    alert("Session request feature coming soon!");
+    if (!user) {
+      toast.error("You must be logged in to send a request");
+      return;
+    }
+
+    try {
+      const exists = await checkExistingRequest(user.id, partnerId);
+
+      if (exists) {
+        toast.warning(
+          "You already have a pending or active session with this partner"
+        );
+        return;
+      }
+
+      await createSessionRequest(user.id, partnerId);
+
+      toast.success("Session request sent! They will be notified.");
+
+      setPartners((prev) => prev.filter((p) => p.id !== partnerId));
+      setFilteredPartners((prev) => prev.filter((p) => p.id !== partnerId));
+    } catch (err) {
+      console.error("Failed to send request:", err);
+      toast.error("Failed to send session request. Please try again.");
+    }
   };
 
   if (loading) {
@@ -93,6 +122,9 @@ export default function FindPartnersTab() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
+
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Find Partners</h1>
