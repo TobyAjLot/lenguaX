@@ -6,6 +6,8 @@ import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePage from "./pages/ProfilePage";
 import FindPartnersPage from "./pages/FindPartnersPage";
+import SessionsPage from "./pages/SessionsPage";
+import DashboardLayout from "./components/DashboardLayout";
 
 const App = () => {
   const { initialize, user, loading } = useAuthStore();
@@ -61,15 +63,18 @@ const App = () => {
         }
       />
 
-      {/* Placeholder routes for other sections */}
       <Route
         path="/sessions"
         element={
           <ProtectedRoute>
-            <DashboardPage />
+            <DashboardLayout>
+              <SessionsPage />
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
+
+      {/* Placeholder routes for other sections */}
       <Route
         path="/messages"
         element={

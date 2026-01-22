@@ -55,7 +55,7 @@ export interface Session {
   partner_id: string;
   scheduled_at: string | null;
   status: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
-  meeting_link: string | null;
+  duration: number;
   created_at: string;
 
   // Joined data (optional - populated when using select with joins)

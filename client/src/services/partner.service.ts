@@ -7,7 +7,7 @@ import type { CompatiblePartner, PartnerFilters } from "../../../shared/types";
  */
 export async function findCompatiblePartners(
   userId: string,
-  filters?: PartnerFilters
+  filters?: PartnerFilters,
 ): Promise<CompatiblePartner[]> {
   try {
     // Call the Supabase RPC function
@@ -29,19 +29,19 @@ export async function findCompatiblePartners(
 
     if (filters?.nativeLanguage) {
       results = results.filter((partner) =>
-        partner.native_languages.includes(filters.nativeLanguage!)
+        partner.native_languages.includes(filters.nativeLanguage!),
       );
     }
 
     if (filters?.learningLanguage) {
       results = results.filter((partner) =>
-        partner.learning_languages.includes(filters.learningLanguage!)
+        partner.learning_languages.includes(filters.learningLanguage!),
       );
     }
 
     if (filters?.minMatchScore !== undefined) {
       results = results.filter(
-        (partner) => partner.match_score >= filters.minMatchScore!
+        (partner) => partner.match_score >= filters.minMatchScore!,
       );
     }
 
@@ -60,7 +60,7 @@ export function getExchangeLanguages(
   userNative: string[],
   userLearning: string[],
   partnerNative: string[],
-  partnerLearning: string[]
+  partnerLearning: string[],
 ): {
   youTeach: string[];
   youLearn: string[];

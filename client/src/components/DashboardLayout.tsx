@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
+import { useSessionNotifications } from "../hooks/useSessionNotifications";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -20,6 +21,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuthStore();
+  const pendingSessionCount = useSessionNotifications(user?.id);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
@@ -77,7 +79,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const navItems = [
     { path: "/dashboard", label: "Dashboard", icon: Home },
     { path: "/find-partners", label: "Find Partners", icon: Search },
-    { path: "/sessions", label: "My Sessions", icon: Calendar },
+    {
+      path: "/sessions",
+      label: "My Sessions",
+      icon: Calendar,
+      badge: pendingSessionCount > 0 ? pendingSessionCount : undefined,
+    },
     { path: "/messages", label: "Messages", icon: MessageSquare },
     { path: "/profile", label: "Profile", icon: User },
   ];
@@ -149,6 +156,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               >
                 <Icon className="h-5 w-5" />
                 <span className="font-medium">{item.label}</span>
+                {item.badge && (
+                  <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {item.badge}
+                  </span>
+                )}
               </button>
             );
           })}
