@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LenguaX
 
-## Getting Started
+A peer-to-peer language exchange web platform built on a value-for-value model. Two users who speak each other's target language connect and exchange asynchronous voice notes and text messages.
 
-First, run the development server:
+**No live calls. No payments. No tutorial hell.**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js (App Router)
+- **BaaS Engine:** Supabase (Auth, Postgres DB, Storage, Realtime)
+- **Styling:** Tailwind CSS
+- **Deployment:** Vercel (Edge Infrastructure)
+
+_Architecture Note: Monolithic codebase. No standalone Express/Socket.io backend. All state mutations flow through Next.js Server Actions. Live updates utilize native Supabase Realtime subscriptions._
+
+---
+
+## 📂 Repository Structure
+
+```text
+/
+├── app/
+│   ├── (auth)/             # Login and Signup workflows
+│   ├── (app)/
+│   │   ├── onboarding/     # Language capability configuration wizard
+│   │   ├── dashboard/      # Match list discovery grid
+│   │   ├── chat/[id]/      # Active communication canvas (Text + Audio)
+│   │   └── profile/[id]/   # User information & safety blocks
+│   ├── globals.css
+│   └── layout.tsx
+├── components/
+│   ├── ui/                 # Atomic design primitives
+│   ├── chat/               # AudioPlayer, AudioRecorder, MessageBubble
+│   └── discovery/          # MatchCard, LanguageBadge
+├── lib/
+│   ├── supabase/           # Server, Client, and Middleware initializers
+│   ├── actions/            # Unified write-path Server Actions
+│   └── utils/              # Client-side formatting wrappers
+├── types/                  # Database types generated via Supabase CLI
+└── supabase/
+    └── migrations/         # Versioned local SQL scripts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+💾 Core Domain Model
+users: Profiles linked directly to auth.users.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+user_languages: Many-to-one relationship map classifying NATIVE and LEARNING capabilities with explicit integer proficiencies (1-5).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+sessions: Active conversation bridges holding status gates (PENDING, ACTIVE, ARCHIVED).
 
-## Learn More
+messages: Multi-modal ledger specifying payload varieties (TEXT vs AUDIO) bound to a storage path bucket template: {session_id}/{message_id}.m4a.
 
-To learn more about Next.js, take a look at the following resources:
+blocks: Reactive user-isolation tracking.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+🚀 Local Development Checklist
+Clone the repository and install dependencies: npm install
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Authenticate and initialize the Supabase CLI environment.
 
-## Deploy on Vercel
+Pull or generate database types into types/database.types.ts.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Run the local Next.js development server: npm run dev
